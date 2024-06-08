@@ -11,7 +11,7 @@ const {
     getCourse,
     insertIntoCourseSeelction,
     getSubmittedCourse,
-    getFullApplication
+    getFullApplication, courseCompleted
 } = require('./application.service');
 
 module.exports = {
@@ -253,6 +253,31 @@ module.exports = {
     getFullApplication: (req, res) => {
         const id = req.params.id;
         getFullApplication(id, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+
+            if (results?.length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "no data"
+                });
+            }
+
+            return res.status(200).json({
+                success: 1,
+                message: 'success',
+                data: results
+            });
+        });
+    },
+
+    courseCompleted: (req, res) => {
+        const id = req.params.id;
+        courseCompleted(id, (err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,

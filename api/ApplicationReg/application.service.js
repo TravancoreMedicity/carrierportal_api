@@ -133,7 +133,7 @@ module.exports = {
                 `INSERT INTO application (
                     application_id,
                     app_google_id,
-                    age,
+                    age,cast,religion,
                     nationality,
                     adhar,
                     guardian,
@@ -161,11 +161,13 @@ module.exports = {
                     app_status
                     )
                 VALUES
-                (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+                (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
                 [
                     data.applicationId,
                     data.app_google_ID,
                     data.age,
+                    data.cast,
+                    data.religion,
                     data.nationality,
                     data.adharNo,
                     data.guardianName,
@@ -406,7 +408,12 @@ module.exports = {
             C.app_dob,
             C.app_payment_refno,
             C.app_payment_amount,
+            if( C.app_gender = 1 ,'Female','Male') app_gender,
+            C.app_payment_date,
             A.age,
+            A.cast,
+            A.create_date,
+            A.religion,
             A.nationality,
             A.adhar,
             A.guardian,
@@ -495,6 +502,20 @@ module.exports = {
         LEFT JOIN application_cource c7 ON P.cour7 = c7.cour_slno
         LEFT JOIN application_cource c8 ON P.cour8 = c8.cour_slno
         WHERE C.app_status = 1 AND C.app_google_id = ?`,
+            [id],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        )
+    },
+
+    courseCompleted: (id, callBack) => {
+        pool.query(
+            `select application_id from application_selection
+            where application_id = ?`,
             [id],
             (error, results, feilds) => {
                 if (error) {
