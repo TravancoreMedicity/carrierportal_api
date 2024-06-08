@@ -514,8 +514,10 @@ module.exports = {
 
     courseCompleted: (id, callBack) => {
         pool.query(
-            `select application_id from application_selection
-            where application_id = ?`,
+            `select application_selection.application_id ,candidate_registration.app_payment_status
+             from application_selection
+            left join candidate_registration on candidate_registration.app_google_id=application_selection.application_id
+            where application_selection.application_id = ?`,
             [id],
             (error, results, feilds) => {
                 if (error) {
