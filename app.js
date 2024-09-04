@@ -12,9 +12,7 @@ const cors = require('cors');
 
 const app = express();
 const port = process.env.PORT || 5000;
-
 const pool = require('./config/database')
-
 const key = fs.readFileSync('./ssl/key.pem');
 const cert = fs.readFileSync('./ssl/cert.pem');
 
@@ -29,6 +27,7 @@ const httpsServer = https.createServer(httpsOptions, app);
 // Create HTTP server to redirect to HTTPS
 const httpApp = express();
 httpApp.use((req, res, next) => {
+
     if (!req.secure) {
         return res.redirect('https://' + req.headers.host + req.url);
     }
@@ -36,10 +35,14 @@ httpApp.use((req, res, next) => {
 });
 
 
+
 // Passport configuration
 passport.use(new GoogleStrategy({
+    // old
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    //new
+
     callbackURL: "/auth/google/callback",
 },
     async (accessToken, refreshToken, profile, done) => {
@@ -49,11 +52,11 @@ passport.use(new GoogleStrategy({
         const provider = profile.provider;
         const providerAccountId = profile.id;
 
-        pool.query('SELECT * FROM users WHERE email = ?', [email], (err, results) => {
+        pool.query('SELECT * FROM career_user WHERE email = ?', [email], (err, results) => {
             if (err) return done(err);
             if (results.length === 0) {
                 pool.query(
-                    'INSERT INTO users (email, name, image, provider, providerAccountId) VALUES (?, ?, ?, ?, ?)',
+                    'INSERT INTO career_user (email, name, image, provider, providerAccountId) VALUES (?, ?, ?, ?, ?)',
                     [email, name, image, provider, providerAccountId],
                     (err, results) => {
                         if (err) return done(err);
@@ -90,7 +93,6 @@ app.get('/auth/google', passport.authenticate('google', { scope: ['https://www.g
 app.get('/auth/google/callback',
     passport.authenticate('google', { failureRedirect: '/' }),
     (req, res) => {
-
         // console.log(req.user)
         const token = jwt.sign({ id: req.user.id }, '#&%^ghjTmchd*&*slkjoljJID54259GFMHN*jkdgbuyn9779)()*&bjjbjk,nshlmkhd%$$4165BYj76JNhgjk', { expiresIn: '1h' });
         const usdUhdsa = {
@@ -102,7 +104,10 @@ app.get('/auth/google/callback',
 
         const encryptFile = encodeURIComponent(JSON.stringify(usdUhdsa))
         const tkn = encodeURIComponent(token)
-        res.redirect(`http://localhost:3000/CandidateLogin?usdsa=${tkn}&info=${encryptFile}`);
+        // res.redirect(`http://localhost:3000`);Career
+        // res.redirect(`http://localhost:3000/CandidateLogin?usdsa=${tkn}&info=${encryptFile}`);
+        res.redirect(`http://localhost:3000/Career?usdsa=${tkn}&info=${encryptFile}`);
+
     }
 );
 
@@ -118,10 +123,17 @@ app.use(cors());
 app.use(express.json());
 
 
-const appRegistration = require('./api/ApplicationReg/application.router');
+// const appRegistration = require('./api/ApplicationReg/application.router');
+const Career = require('./api/Carrer/carrer.router');
+const getCommonQery = require('./api/CommonCode/common.router');
+const Uploadfile = require('./api/uploadFile/upload.router');
 
-app.use('/api/app_registration', appRegistration)
+// app.use('/api/app_registration', appRegistration)
+app.use('/api/Career', Career)
+app.use('/api/common', getCommonQery)
+app.use('/api/upload', Uploadfile)
 
+// console.log("ffcyfvy");
 // Start servers
 httpsServer.listen(5000, () => {
     console.log('HTTPS Server running on port 443');
