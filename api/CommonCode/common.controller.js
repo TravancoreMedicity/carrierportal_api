@@ -8,7 +8,7 @@ module.exports = {
     getSaluationName: (req, res) => {
         getSaluationNamelist((err, results) => {
             if (err) {
-                logger.errorLogger(err)
+                // logger.errorLogger(err)
                 return res.status(200).json({
                     success: 0,
                     message: err
@@ -16,7 +16,7 @@ module.exports = {
             }
 
             if (!results) {
-                logger.infoLogger("No Records Found")
+                // logger.infoLogger("No Records Found")
                 return res.status(200).json({
                     success: 2,
                     message: "No Result Found"
@@ -34,7 +34,7 @@ module.exports = {
         const id = req.params.id;
         getRegionBypin(id, (err, results) => {
             if (err) {
-                logger.errorLogger(err)
+                // logger.errorLogger(err)
                 return res.status(200).json({
                     success: 0,
                     message: err
@@ -60,7 +60,7 @@ module.exports = {
 
         getData((err, results) => {
             if (err) {
-                logger.errorLogger(err)
+                // logger.errorLogger(err)
                 return res.status(200).json({
                     success: 2,
                     message: err
@@ -131,7 +131,7 @@ module.exports = {
         const body = req.body
         getname(body, (err, results) => {
             if (err) {
-                logger.errorLogger(err)
+                // logger.errorLogger(err)
                 return res.status(200).json({
                     success: 0,
                     message: res.err
@@ -159,7 +159,7 @@ module.exports = {
         const body = req.body
         vacancyList(body, (err, results) => {
             if (err) {
-                logger.errorLogger(err)
+                // logger.errorLogger(err)
                 return res.status(200).json({
                     success: 0,
                     message: res.err
@@ -242,7 +242,7 @@ module.exports = {
         const id = req.params.id;
         getPersonaldata(id, (err, results) => {
             if (err) {
-                logger.errorLogger(err)
+                // logger.errorLogger(err)
                 return res.status(200).json({
                     success: 0,
                     message: err
@@ -312,7 +312,7 @@ module.exports = {
     getUniversity: (req, res) => {
         getUniversity((err, results) => {
             if (err) {
-                logger.errorLogger(err)
+                // logger.errorLogger(err)
                 return res.status(200).json({
                     success: 0,
                     message: err
@@ -320,7 +320,7 @@ module.exports = {
             }
 
             if (results.length == 0) {
-                logger.infoLogger("No Records Found")
+                // logger.infoLogger("No Records Found")
                 return res.status(200).json({
                     success: 0,
                     message: "No Record Found"
@@ -336,7 +336,7 @@ module.exports = {
     getBoardById: (req, res) => {
         getBoardById((err, results) => {
             if (err) {
-                logger.errorLogger(err)
+                // logger.errorLogger(err)
                 return res.status(200).json({
                     success: 0,
                     message: err
@@ -344,7 +344,7 @@ module.exports = {
             }
 
             if (results.length == 0) {
-                logger.infoLogger("No Records Found")
+                // logger.infoLogger("No Records Found")
                 return res.status(200).json({
                     success: 0,
                     message: "No Record Found"
@@ -361,7 +361,7 @@ module.exports = {
         const id = req.params.id;
         geteducation(id, (err, results) => {
             if (err) {
-                logger.errorLogger(err)
+                // logger.errorLogger(err)
                 return res.status(200).json({
                     success: 0,
                     message: err
