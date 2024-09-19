@@ -52,6 +52,7 @@ module.exports = {
                 return res.status(200).json({
                     success: 2,
                     message: "no data"
+
                 });
             }
 
