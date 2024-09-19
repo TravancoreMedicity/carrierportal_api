@@ -627,6 +627,7 @@ module.exports = {
                 jobsuccess: 1,
                 jobdata: results
             });
+
         });
     },
 

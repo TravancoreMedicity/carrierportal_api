@@ -52,7 +52,7 @@ passport.use(new GoogleStrategy({
         const provider = profile.provider;
         const providerAccountId = profile.id;
 
-        pool.query('SELECT * FROM career_user WHERE email = ?', [email], (err, results) => {
+        pool.query('SELECT * FROM  career_user WHERE email = ?', [email], (err, results) => {
             if (err) return done(err);
             if (results.length === 0) {
                 pool.query(
