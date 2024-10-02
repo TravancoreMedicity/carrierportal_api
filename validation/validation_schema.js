@@ -36,10 +36,7 @@ const Application_form = Joi.object({
 
         }),
     dob: Joi.date().required(),
-    job: Joi.string().required()
-        .messages({
-            'string.empty': 'Where did you hear about this job is required',
-        }),
+    // job: Joi.string().optional(),
     expdata: Joi.optional(),
     edudata: Joi.optional(),
     mname: Joi.optional(),

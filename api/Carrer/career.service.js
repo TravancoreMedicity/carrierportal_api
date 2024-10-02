@@ -651,4 +651,26 @@ module.exports = {
             }
         )
     },
+
+
+
+    updateAbout: (data, callBack) => {
+        pool.query(
+            `UPDATE hrm_application_form
+            SET About = ?
+            WHERE application_no = ?;`,
+            [
+                data.desc,
+                data.ApplicationId
+            ],
+
+            (error, results, feilds) => {
+                if (error) {
+
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        )
+    },
 }

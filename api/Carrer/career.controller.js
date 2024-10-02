@@ -1,7 +1,7 @@
 
 const { getcarrerdata, insertskilldata, getSkillData, updateSkills, deleteskills, insertHobbiesdata, getHobbiesData, updateHobbies, updatelang, insertReference,
     deleteHobbies, insertLangdata, getLangData, getreference, updateref, deleteref, insertCertification, getCertification, updateCertification,
-    deletecertification, getAppledJob, getAppledJobDetails, updateJob, getjobdata, getSkilldata } = require('../Carrer/career.service')
+    deletecertification, getAppledJob, getAppledJobDetails, updateJob, getjobdata, getSkilldata, updateAbout } = require('../Carrer/career.service')
 module.exports = {
 
     getcarrerdata: (req, res) => {
@@ -651,6 +651,33 @@ module.exports = {
                 Skillsucces: 1,
                 Skilldata: results
             });
+        });
+    },
+
+
+    updateAbout: (req, res) => {
+        const body = req.body;
+        updateAbout(body, (err, results) => {
+            if (err) {
+                // logger.errorLogger(err)
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+
+            if (!results) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "Record Not Found"
+                });
+            }
+
+            return res.status(200).json({
+                success: 2,
+                message: "Data Updated Successfully"
+            });
+
         });
     },
 }

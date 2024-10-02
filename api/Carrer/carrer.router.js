@@ -3,7 +3,7 @@ const { checkToken } = require('../../auth/token_validation');
 
 const { getcarrerdata, insertskilldata, getSkillData, updateSkills, deleteskills, insertHobbiesdata, getHobbiesData, updateHobbies, updatelang, insertReference,
     deleteHobbies, insertLangdata, getLangData, getreference, updateref, deleteref, insertCertification, getCertification, updateCertification,
-    deletecertification, getAppledJob, getAppledJobDetails, updateJob, getjobdata, getSkilldata } = require('../Carrer/career.controller');
+    deletecertification, getAppledJob, getAppledJobDetails, updateJob, getjobdata, getSkilldata, updateAbout } = require('../Carrer/career.controller');
 
 
 router.get('/approvalget/all', getcarrerdata)
@@ -47,6 +47,7 @@ router.post("/updateJob", updateJob)
 router.get('/jobdesc', getjobdata)
 router.get('/jobSkill', getSkilldata)
 
+router.post("/updateAbout", updateAbout)
 
 
 module.exports = router

@@ -26,11 +26,13 @@ require('dotenv').config();
 
 // Create the connection pool. The pool-specific settings are the defaults
 const pool = createPool({
-    host: '192.168.22.170',
+    host: '192.168.11.42',
     user: 'webadmin',
     // user: process.env.DB_USER,
-    password: 'It@12345',
-    database: 'medi_hrm',
+    // password: 'It@12345',
+    password: 'Medicity@123',
+    // database: 'medi_hrm',
+    database: "medi_hrm_folio",
     // waitForConnections: true,
     connectionLimit: 10,
     // maxIdle: 10, // max idle connections, the default value is the same as `connectionLimit`

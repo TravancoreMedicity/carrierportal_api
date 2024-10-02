@@ -106,6 +106,7 @@ app.get('/auth/google/callback',
         const tkn = encodeURIComponent(token)
         // res.redirect(`http://localhost:3000`);Career
         // res.redirect(`http://localhost:3000/CandidateLogin?usdsa=${tkn}&info=${encryptFile}`);
+
         res.redirect(`http://localhost:3000/Career?usdsa=${tkn}&info=${encryptFile}`);
 
     }
