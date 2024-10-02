@@ -53,7 +53,37 @@ const storagemulCertificate = multer.diskStorage({
     },
 
 });
+// for profile pic upload
+const storagemulpropic = multer.diskStorage({
+    destination: (req, file, cb) => {
 
+        const id = req.body.em_id;
+        const em_id_folder = path.join('D:/Career/profilePicture', `${id}`);
+
+        if (fs.existsSync(em_id_folder)) {
+            // If it exists, delete all files inside
+            const existingFiles = fs.readdirSync(em_id_folder);
+            for (const file of existingFiles) {
+                fs.unlinkSync(path.join(em_id_folder, file));
+            }
+        } else {
+            // If it doesn't exist, create the folder
+            fs.mkdirSync(em_id_folder, { recursive: true });
+        }
+
+
+        cb(null, em_id_folder);
+    },
+    filename: function (req, file, cb) {
+        // Generate a unique filename using a timestamp
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        const extension = path.extname(file.originalname);
+        const filename = 'Resume' + uniqueSuffix + extension;
+        cb(null, filename);
+
+    },
+
+});
 const maxSize = 2 * 1024 * 1024
 
 // for certificate
@@ -93,6 +123,24 @@ const uploadmul = multer({
     limits: { fileSize: maxSize }
 }).array('files', 10);
 
+//for profile picture
+const uploadmulpropic = multer({
+    storage: storagemulpropic,
+    fileFilter: (req, file, cb) => {
+        if (
+            file.mimetype == "image/png" ||
+            file.mimetype == "image/jpg" ||
+            file.mimetype == "image/jpeg" ||
+            file.mimetype == "application/pdf" // Add PDF mimetype
+        ) {
+            cb(null, true);
+        } else {
+            cb(null, false);
+            return cb(new Error('Only .png, .jpg, .jpeg, and .pdf format allowed!'));
+        }
+    },
+    limits: { fileSize: maxSize }
+}).array('files', 10);
 module.exports = {
 
     // for multiple file upload
@@ -250,6 +298,8 @@ module.exports = {
                             filename = 'PG_certificate&' + formattedDate + extension;
                         } else if (qual == 5) {
                             filename = 'Other_certificate&' + formattedDate + extension;
+                        } else if (qual == 6) {
+                            filename = 'Resume&' + formattedDate + extension;
                         }
                         else {
                             filename = file.originalname;
@@ -330,5 +380,72 @@ module.exports = {
             });
         });
     },
+    uploadImage: (req, res) => {
+        uploadmulpropic(req, res, async (err) => {
+            const body = req.body;
+            if (err instanceof multer.MulterError) {
+                return res.status(200).json({
+                    status: 0,
+                    message: "Max file size 2MB allowed!",
+                });
+            } else if (err) {
+                return res.status(200).json({
+                    status: 0,
+                    message: err.message,
+                });
+            } else if (!req.files || req.files.length === 0) {
+                return res.status(200).json({
+                    status: 0,
+                    message: "Files are required!",
+                });
+            } else {
+                try {
+                    const files = req.files;
+                    const em_id = body.em_id;
+                    const em_id_folder = path.join('D:/Career/profilePicture', `${em_id}`);
 
+                    for (const file of files) {
+                        const extension = path.extname(file.originalname);
+                        const FileName = file.originalname;
+                        const currentDate = new Date();
+                        const formattedDate = `${currentDate.getDate().toString().padStart(2, '0')}-${(currentDate.getMonth() + 1).toString().padStart(2, '0')}-${currentDate.getFullYear()}`;
+                        const filename = `${FileName}${formattedDate}${extension}`;
+
+                        // Move the file to the destination folder
+                        const destinationPath = path.join(em_id_folder, filename);
+                        fs.renameSync(file.path, destinationPath);
+                    }
+                    res.status(200).json({
+                        success: 1,
+                        message: "Profile Picture Changed Successfully!"
+                    });
+                } catch (error) {
+                    return res.status(200).json({
+                        success: 0,
+                        message: "An error occurred during file upload.",
+                    });
+                }
+            }
+        });
+    },
+
+
+    checklistpropic: (req, res) => {
+        const { ApplicationId } = req.body;
+        const folderPath = `D:/Career/profilePicture/${ApplicationId}`;
+        fs.readdir(folderPath, (err, files) => {
+            if (err) {
+                // logger.errorLogger(err)
+                return res.status(200).json({
+                    successimg: 0,
+                    message: err
+                });
+            }
+            return res.status(200).json({
+                successimg: 1,
+                dataimg: files
+            });
+        });
+
+    },
 }
