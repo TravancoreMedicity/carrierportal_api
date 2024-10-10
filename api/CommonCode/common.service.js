@@ -159,16 +159,17 @@ module.exports = {
                 address2,
                 bloodgrp,
                 gender,
-                About
+                About,
+                state
                 )
-                VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+                VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
             [
                 data.value, data.name, data.lname, data.mname, data.email, data.mobile, data.Region, data.Religion, data.dob, data.opportunity_status,
                 data.vaccination_status, data.helath_status, data.Health, data.job, data.criminal_status, data.criminal, data.legal_obligation_status,
                 data.obligation, data.relatives_friends_status, data.empemail, data.empname, data.empno,
                 data.agree_status, data.agree_marketing_status, data.recruitment_sts,
                 data.recruitment, data.applicationSlno, JSON.stringify(data.expdata), JSON.stringify(data.edudata), JSON.stringify(data.selectedVacancies),
-                data.addressPermnt1, data.addressPermnt2, data.bloodgrp, data.gender, data.About
+                data.addressPermnt1, data.addressPermnt2, data.bloodgrp, data.gender, data.About, data.State
             ],
             (error, results, feilds) => {
 
@@ -200,8 +201,11 @@ module.exports = {
              address2,
              bloodgrp,
              gender,
-             About
-             FROM hrm_application_form where application_no=? `,
+             About,
+              dist_name
+             FROM hrm_application_form
+               LEFT JOIN hrm_district ON hrm_application_form.state = hrm_district.dist_slno
+             where application_no=? `,
             [
                 id
             ],
@@ -344,5 +348,273 @@ FROM
                 return callBack(null, results);
             }
         )
+    },
+
+    insertdataexpdata: (data, callBack) => {
+        // Create a new experience object from the incoming data
+        const newExperienceDetail = {
+            idexp: Math.ceil(Math.random() * 1000), // Generate a unique ID
+            ...data.experience // Assuming `data.experience` is an object with experience details
+        };
+
+        // Convert the new experience detail to a JSON string
+        const newExperienceJson = JSON.stringify(newExperienceDetail);
+
+        pool.query(
+            `UPDATE hrm_application_form
+             SET Experience_details = 
+                 CASE
+                     WHEN Experience_details IS NULL THEN ? 
+                     ELSE JSON_ARRAY_APPEND(Experience_details, '$', CAST(? AS JSON))
+                 END
+             WHERE application_no = ?`,
+            [
+                JSON.stringify([newExperienceDetail]), // For NULL case, insert a new array
+                newExperienceJson, // For existing case, append the new experience detail
+                data.ApplicationId
+            ],
+            (error, results) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+    },
+
+
+    insertdataedudata: (data, callBack) => {
+        const newEducationDetail = {
+            id: Math.ceil(Math.random() * 1000),
+            ...data.education_details[0]
+        };
+        // Convert the new education detail to a JSON string
+        const newEducationJson = JSON.stringify(newEducationDetail);
+
+        pool.query(
+            `UPDATE hrm_application_form
+            SET Education_details = 
+                CASE
+                    WHEN Education_details IS NULL THEN ? 
+                    ELSE JSON_ARRAY_APPEND(Education_details, '$', CAST(? AS JSON))
+                END
+            WHERE application_no = ?`,
+            [
+                JSON.stringify([newEducationDetail]),
+                newEducationJson,
+                data.ApplicationId
+            ],
+            (error, results) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+
+            }
+        );
+    },
+
+
+
+
+
+
+    updataexpdata: (data, callBack) => {
+
+        const { id, Applicationslno } = data;
+        const experienceId = id;
+        const newExperienceDetail = {
+            idexp: Math.ceil(Math.random() * 1000),
+            ...data.experience
+        };
+
+        const newExperienceJson = JSON.stringify(newExperienceDetail);
+
+        pool.query(
+            `UPDATE hrm_application_form
+            SET Experience_details = 
+                CASE
+                    WHEN Experience_details IS NULL THEN ? 
+                    ELSE JSON_ARRAY_APPEND(Experience_details, '$', CAST(? AS JSON))
+                END
+            WHERE application_no = ?`     ,
+            [
+                JSON.stringify([newExperienceDetail]), // For NULL case, insert a new array
+                newExperienceJson, // For existing case, append the new experience detail
+                data.ApplicationId
+            ],
+            (error, results) => {
+                if (error) {
+                    return callBack(error);
+                }
+                // Step 2: Append new experience
+                pool.query(
+                    `UPDATE hrm_application_form
+                    SET Experience_details = CASE 
+                        WHEN JSON_LENGTH(Experience_details) = 1 THEN NULL
+                        ELSE (
+                            SELECT JSON_ARRAYAGG(value)
+                            FROM (
+                                SELECT value
+                                FROM JSON_TABLE(Experience_details, '$[*]' 
+                                    COLUMNS (value JSON PATH '$', idexp INT PATH '$.idexp')) AS jt
+                                WHERE jt.idexp != ?
+                            ) AS filtered
+                        )
+                    END
+                    WHERE application_slno = ? AND JSON_CONTAINS(Experience_details, JSON_OBJECT('idexp', ?));` ,
+                    [experienceId, Applicationslno, experienceId],
+                    (error, results) => {
+                        if (error) {
+                            return callBack(error);
+                        }
+                        return callBack(null, results);
+                    }
+                );
+            }
+        );
+    },
+
+
+    deleteexpdata: (data, callBack) => {
+        const { id, Applicationslno } = data;
+        const experienceId = id;
+
+        pool.query(
+            `UPDATE hrm_application_form
+            SET Experience_details = CASE 
+                WHEN JSON_LENGTH(Experience_details) = 1 THEN NULL
+                ELSE (
+                    SELECT JSON_ARRAYAGG(value)
+                    FROM (
+                        SELECT value
+                        FROM JSON_TABLE(Experience_details, '$[*]' 
+                            COLUMNS (value JSON PATH '$', idexp INT PATH '$.idexp')) AS jt
+                        WHERE jt.idexp != ?
+                    ) AS filtered
+                )
+            END
+            WHERE application_slno = ? AND JSON_CONTAINS(Experience_details, JSON_OBJECT('idexp', ?));`,
+            [
+                experienceId,
+                Applicationslno,
+                experienceId
+            ],
+
+            (error, results) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+    },
+
+    updataedudata: (data, callBack) => {
+
+        const { id, Applicationslno } = data;
+        const experienceId = id;
+        const newEducationDetail = {
+            id: Math.ceil(Math.random() * 1000),
+            ...data.education_details[0]
+        };
+        // Convert the new education detail to a JSON string
+        const newEducationJson = JSON.stringify(newEducationDetail);
+
+        pool.query(
+            `UPDATE hrm_application_form
+            SET Education_details = 
+                CASE
+                    WHEN Education_details IS NULL THEN ? 
+                    ELSE JSON_ARRAY_APPEND(Education_details, '$', CAST(? AS JSON))
+                END
+            WHERE application_no = ?`   ,
+            [
+                JSON.stringify([newEducationDetail]),
+                newEducationJson,
+                data.ApplicationId
+            ],
+            (error, results) => {
+                if (error) {
+                    return callBack(error);
+                }
+                // Step 2: Append new experience
+                pool.query(
+                    `UPDATE hrm_application_form
+                    SET Education_details = CASE 
+                        WHEN JSON_LENGTH(Education_details) = 1 THEN NULL
+                        ELSE (
+                            SELECT JSON_ARRAYAGG(value)
+                            FROM (
+                                SELECT value
+                                FROM JSON_TABLE(Education_details, '$[*]' 
+                                    COLUMNS (value JSON PATH '$', id INT PATH '$.id')) AS jt
+                                WHERE jt.id != ?
+                            ) AS filtered
+                        )
+                    END
+                    WHERE application_slno = ? AND JSON_CONTAINS(Education_details, JSON_OBJECT('id', ?));` ,
+                    [experienceId, Applicationslno, experienceId],
+                    (error, results) => {
+                        if (error) {
+                            return callBack(error);
+                        }
+                        return callBack(null, results);
+                    }
+                );
+            }
+        );
+    },
+
+
+    deleteEdudata: (data, callBack) => {
+
+        const { id, Applicationslno } = data;
+        const experienceId = id;
+
+        pool.query(
+            `UPDATE hrm_application_form
+            SET Education_details = CASE 
+                WHEN JSON_LENGTH(Education_details) = 1 THEN NULL
+                ELSE (
+                    SELECT JSON_ARRAYAGG(value)
+                    FROM (
+                        SELECT value
+                        FROM JSON_TABLE(Education_details, '$[*]' 
+                            COLUMNS (value JSON PATH '$', id INT PATH '$.id')) AS jt
+                        WHERE jt.id != ?
+                    ) AS filtered
+                )
+            END
+            WHERE application_slno = ? AND JSON_CONTAINS(Education_details, JSON_OBJECT('id', ?));`,
+            [
+                experienceId,
+                Applicationslno,
+                experienceId
+            ],
+
+            (error, results) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+    },
+
+
+    getDistrictName: (callBack) => {
+        pool.query(
+            `
+            SELECT dist_name,dist_slno FROM hrm_district where  dist_status ='1'`,
+            [],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+
+                return callBack(null, results);
+            }
+        );
     },
 }

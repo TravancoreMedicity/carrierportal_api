@@ -1,5 +1,5 @@
-const { getSaluationNamelist, getRegionBypin, getData, getBloodgrp, getEducation, getname, vacancyList, insertapplicationform,
-    getPersonaldata, getCourseById, getSpecializationById, getUniversity, getBoardById, geteducation } = require('../CommonCode/common.service')
+const { getSaluationNamelist, getRegionBypin, getData, getBloodgrp, getEducation, getname, vacancyList, insertapplicationform, updataexpdata, deleteexpdata, getDistrictName,
+    getPersonaldata, getCourseById, getSpecializationById, getUniversity, getBoardById, geteducation, insertdataexpdata, insertdataedudata, updataedudata, deleteEdudata } = require('../CommonCode/common.service')
 const { Application_form } = require('../../validation/validation_schema')
 const nodemailer = require('nodemailer');
 
@@ -381,5 +381,192 @@ module.exports = {
             });
         });
 
+    },
+
+
+    insertdataexpdata: (req, res) => {
+        const body = req.body;
+        insertdataexpdata(body, (err, results) => {
+            if (err) {
+                // logger.errorLogger(err)
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+
+            if (!results) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "Record Not Found"
+                });
+            }
+
+            return res.status(200).json({
+                success: 2,
+                message: "Data Updated Successfully"
+            });
+
+        });
+    },
+
+
+    insertdataedudata: (req, res) => {
+        const body = req.body;
+        insertdataedudata(body, (err, results) => {
+            if (err) {
+                // logger.errorLogger(err)
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+
+            if (!results) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "Record Not Found"
+                });
+            }
+
+            return res.status(200).json({
+                success: 2,
+                message: "Data Updated Successfully"
+            });
+
+        });
+    },
+
+    updataexpdata: (req, res) => {
+        const body = req.body;
+        updataexpdata(body, (err, results) => {
+            if (err) {
+                // logger.errorLogger(err)
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+
+            if (!results) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "Record Not Found"
+                });
+            }
+
+            return res.status(200).json({
+                success: 2,
+                message: "Data Updated Successfully"
+            });
+
+        });
+    },
+
+    deleteexpdata: (req, res) => {
+        const body = req.body;
+        deleteexpdata(body, (err, results) => {
+            if (err) {
+                // logger.errorLogger(err)
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+
+            if (!results) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "Record Not Found"
+                });
+            }
+
+            return res.status(200).json({
+                success: 2,
+                message: "Data Updated Successfully"
+            });
+
+        });
+    },
+
+
+    updataedudata: (req, res) => {
+        const body = req.body;
+        updataedudata(body, (err, results) => {
+            if (err) {
+                // logger.errorLogger(err)
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+
+            if (!results) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "Record Not Found"
+                });
+            }
+
+            return res.status(200).json({
+                success: 2,
+                message: "Data Updated Successfully"
+            });
+
+        });
+    },
+
+
+    deleteEdudata: (req, res) => {
+        const body = req.body;
+        deleteEdudata(body, (err, results) => {
+            if (err) {
+                // logger.errorLogger(err)
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+
+            if (!results) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "Record Not Found"
+                });
+            }
+
+            return res.status(200).json({
+                success: 2,
+                message: "Data Updated Successfully"
+            });
+
+        });
+    },
+
+
+    getDistrictName: (req, res) => {
+
+        getDistrictName((err, results) => {
+            if (err) {
+                logger.errorLogger(err)
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+
+            if (!results) {
+                logger.infoLogger("No Records Found")
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Result Found"
+                });
+            }
+
+            return res.status(200).json({
+                success: 1,
+                data: results
+            });
+        });
     },
 }
