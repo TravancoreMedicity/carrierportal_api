@@ -35,6 +35,11 @@ const Application_form = Joi.object({
             'number.min': ' Religion  Not selected',
 
         }),
+    State: Joi.number().min(0).required()
+        .messages({
+            'number.min': ' State  Not selected',
+
+        }),
     dob: Joi.date().required(),
     // job: Joi.string().optional(),
     expdata: Joi.optional(),

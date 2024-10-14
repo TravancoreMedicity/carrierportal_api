@@ -1,8 +1,8 @@
 const router = require('express').Router();
 // const { checkToken } = require('../../auth/token_validation');
 
-const { getSaluationName, getRegionBypin, getReligion, getBloodgrp, getEducation, getSpecializationById, getname, vacancyList,
-    insertapplicationform, getPersonaldata, getCourseById, getUniversity, getBoardById, geteducation, } = require('../CommonCode/common.controller');
+const { getSaluationName, getRegionBypin, getReligion, getBloodgrp, getEducation, getSpecializationById, getname, vacancyList, deleteexpdata, updataedudata, deleteEdudata,
+    insertapplicationform, getPersonaldata, getCourseById, getUniversity, getBoardById, geteducation, insertdataexpdata, insertdataedudata, updataexpdata, getDistrictName } = require('../CommonCode/common.controller');
 
 
 router.get("/getSalutation", getSaluationName)
@@ -19,6 +19,13 @@ router.post('/specialization/ById', getSpecializationById);
 router.get("/getUniver", getUniversity)
 router.get("/getBoard", getBoardById) // get Board by education
 router.get("/educationDetails/:id", geteducation)
+router.post("/insertdataexpdata", insertdataexpdata)
+router.post("/insertdataedudata", insertdataedudata)
+router.post("/updataexpdata", updataexpdata)
+router.post("/deleteexpdata", deleteexpdata)
+router.post("/updataedudata", updataedudata)
+router.post("/deleteEdudata", deleteEdudata)
+router.get("/getdist", getDistrictName)
 
 
 
